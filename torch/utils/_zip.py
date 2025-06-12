@@ -26,7 +26,7 @@ DENY_LIST = [
     "_bootstrap_external.py",
 ]
 
-strip_file_dir = ""
+
 
 
 def remove_prefix(text, prefix):
@@ -36,7 +36,7 @@ def remove_prefix(text, prefix):
 
 
 def write_to_zip(file_path, strip_file_path, zf, prepend_str=""):
-    stripped_file_path = prepend_str + remove_prefix(file_path, strip_file_dir + "/")
+    stripped_file_path = prepend_str + remove_prefix(file_path, strip_file_path)
     path = Path(stripped_file_path)
     if path.name in DENY_LIST:
         return
@@ -44,7 +44,6 @@ def write_to_zip(file_path, strip_file_path, zf, prepend_str=""):
 
 
 def main() -> None:
-    global strip_file_dir
     parser = argparse.ArgumentParser(description="Zip py source")
     parser.add_argument("paths", nargs="*", help="Paths to zip.")
     parser.add_argument(
@@ -66,7 +65,7 @@ def main() -> None:
     args = parser.parse_args()
 
     zip_file_name = args.install_dir + "/" + args.zip_name
-    strip_file_dir = args.strip_dir
+    strip_dir = args.strip_dir
     prepend_str = args.prepend_str
     zf = ZipFile(zip_file_name, mode="w")
 
@@ -76,10 +75,10 @@ def main() -> None:
             for file_path in sorted(files):
                 # strip the absolute path
                 write_to_zip(
-                    file_path, strip_file_dir + "/", zf, prepend_str=prepend_str
+                    file_path, strip_dir + "/", zf, prepend_str=prepend_str
                 )
         else:
-            write_to_zip(p, strip_file_dir + "/", zf, prepend_str=prepend_str)
+            write_to_zip(p, strip_dir + "/", zf, prepend_str=prepend_str)
 
 
 if __name__ == "__main__":
